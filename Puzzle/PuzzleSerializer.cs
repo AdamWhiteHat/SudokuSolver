@@ -125,7 +125,7 @@ namespace SudokuGame
 		{
 			string text = File.ReadAllText(Filename);
 			
-			// Remove whitespace & gridlines
+			// Remove whitespace & grid lines
 			text = text.Replace("\t","");
 			text = text.Replace(" ","");
 			text = text.Replace("-----------","");
@@ -145,7 +145,7 @@ namespace SudokuGame
 			text = text.Replace("|","");
 			
 			// Remove section headers
-			text = text.Replace("[Colours]","");
+			text = text.Replace("[Colors]","");
 			text = text.Replace("[State]","");
 			text = text.Replace("[PencilMarks]","");
 			text = text.Replace("[Puzzle]","");

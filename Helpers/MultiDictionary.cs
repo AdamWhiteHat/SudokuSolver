@@ -16,7 +16,7 @@ namespace MultiKeyDictionaries
 {
 	/// <summary>
 	/// Lictionary is a sorted dictionary with multiple values per key (List).
-	/// Key = # of occurances, Value = List of numbers that occured that many times.
+	/// Key = # of occurrences, Value = List of numbers that occurred that many times.
 	/// </summary>
 	//[DebuggerDisplay("Value = {Enumerator}")]
 	public class RankingDictionary<V>
@@ -45,7 +45,7 @@ namespace MultiKeyDictionaries
 		}
 		
 		public override string ToString()
-		{	// Key = # of occurances, Value = List of numbers that occured that many times.
+		{	// Key = # of occurrences, Value = List of numbers that occurred that many times.
 			StringBuilder str = new StringBuilder();			
 			foreach(var kvp in _dictionary)
 			{
@@ -68,7 +68,7 @@ namespace MultiKeyDictionaries
 		}
 	}
 	
-	// Key == number, Value == # of occurances
+	// Key == number, Value == # of occurrences
 	//[DebuggerDisplay("Value = {Enumerator}")]
 	public class FrequencyDictionary<T>
 	{
@@ -107,7 +107,7 @@ namespace MultiKeyDictionaries
 		}
 		
 		public override string ToString()
-		{	 // Key == number, Value == # of occurances
+		{	 // Key == number, Value == # of occurrences
 			StringBuilder str = new StringBuilder();			
 			foreach(var kvp in _dictionary)
 			{
@@ -115,8 +115,7 @@ namespace MultiKeyDictionaries
 			}			
 			return str.ToString();
 		}
-
-		
+				
 //		public T this[int Index]
 //		{
 //			get 
