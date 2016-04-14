@@ -212,7 +212,7 @@ namespace SudokuSolver
 						if(!isUnique) break;
 						foreach(SudokuCell match in foundMatches)
 						{
-							// Dont rely matching just values alone, ensure that we are talking about the same position
+							// Don't rely matching just values alone, ensure that we are talking about the same position
 							if(toSkip.Key==match.GridPosition.ToString())
 							{
 								if(toSkip.Value == match.FormatCandidatesString_Compact())
@@ -245,7 +245,11 @@ namespace SudokuSolver
 			
 			foreach(SudokuCell seen in matchingGroup)
 			{
-				visitedGroups.Add(seen.GridPosition.ToString(),seen.FormatCandidatesString_Compact());
+				string positionKey = seen.GridPosition.ToString();
+				if (!visitedGroups.ContainsKey(positionKey))
+				{
+					visitedGroups.Add(positionKey, seen.FormatCandidatesString_Compact());
+				}
 			}
 			
 			int totalEliminated = 0;
@@ -300,7 +304,7 @@ namespace SudokuSolver
 			List<SudokuCell> block = GetUnsolvedBlock(blockIndex);
 			RankingDictionary<int> candidateRanking = GetCandidateRanking(block);
 			
-			List<int> hiddenSingle = candidateRanking[1]; // Index == # of occurances-1, value == candidate digit that appears that number of times
+			List<int> hiddenSingle = candidateRanking[1]; // Index == # of occurrences-1, value == candidate digit that appears that number of times
 			List<int> hiddenPair = candidateRanking[2];
 			List<int> hiddenTriple = candidateRanking[3];
 			
@@ -422,13 +426,13 @@ namespace SudokuSolver
 				
 				if(InSameColumn(candidatePair))
 				{
-					DebugWrite("Succeded (column) for {0}.",ident);
+					DebugWrite("Succeeded (column) for {0}.", ident);
 					List<SudokuCell> scope = _sudokuGrid.GetColumnScope(columnNumber).Except(candidatePair).ToList();
 					return RemoveCandidatesValues(values, scope);
 				}
 				else if(InSameRow(candidatePair))
 				{
-					DebugWrite("Succeded (row) for {0}.",ident);
+					DebugWrite("Succeeded (row) for {0}.", ident);
 					List<SudokuCell> scope = _sudokuGrid.GetRowScope(rowNumber).Except(candidatePair).ToList();
 					return RemoveCandidatesValues(values, scope);
 				}
