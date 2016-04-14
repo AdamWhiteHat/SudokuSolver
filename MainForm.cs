@@ -38,15 +38,46 @@ namespace SudokuForm
 
 		public void DebugWrite(string MessageFormat, params object[] Args)
 		{
-			this.Invoke(new MethodInvoker(delegate { tbDebug.Text += string.Format("{0}{1}{2}", MessageFormat, Args, Environment.NewLine); } ));
+			if (string.IsNullOrWhiteSpace(MessageFormat))
+			{
+				DebugWrite("");
+			}
+			else if (Args == null || Args.Length < 1)
+			{
+				DebugWrite(MessageFormat);
+			}
+			else
+			{
+				DebugWrite(string.Format(MessageFormat, Args));
+			}
+		}
+
+		public void DebugWrite(string Message)
+		{
+			if (this.InvokeRequired)
+			{
+				this.Invoke(new MethodInvoker(delegate { DebugWrite(Message); }));
+			}
+			else
+			{
+				if (!string.IsNullOrWhiteSpace(Message))
+				{					
+					tbDebug.AppendText(Message);
+				}
+				tbDebug.AppendText(Environment.NewLine);
+			}
 		}
 
 		private void HideGrid()
 		{
+			//sudokuGrid.Visible = false;
+			this.Controls.Remove(sudokuGrid); // this.SuspendLayout();
 		}
 
 		private void ShowGrid()
-		{
+		{			
+			this.Controls.Add(sudokuGrid); // this.ResumeLayout();
+			//sudokuGrid.Visible = true;
 		}
 		
 		void InitializeGrid(string puzzleFile="")
@@ -74,15 +105,15 @@ namespace SudokuForm
 			moderateSolver.DisplayOutputFunction = DebugWrite;
 			
 			List<int> puzzleArray = puzzle.Select(c => c.Value).ToList();
-			tbDebug.Text += string.Format("Puzzle: \"{0}\"{1}", StaticSudoku.ArrayToString(puzzleArray), Environment.NewLine);
+			tbDebug.AppendText(string.Format("Puzzle: \"{0}\"{1}", StaticSudoku.ArrayToString(puzzleArray), Environment.NewLine));
 		}
 		
 		void BtnNewPuzzleClick(object sender, EventArgs e)
 		{
-			this.Controls.Remove(sudokuGrid);
+			HideGrid();
 			InitializeGrid();
 			sudokuGrid.PaintGrid();
-			this.Controls.Add(sudokuGrid);			
+			ShowGrid();
 		}
 		
 		void BtnRefreshClick(object sender, EventArgs e)
@@ -91,46 +122,40 @@ namespace SudokuForm
 		}
 		
 		void BtnSolveClick(object sender, EventArgs e)
-		{
-			//sudokuGrid.Visible = false;
-			this.Controls.Remove(sudokuGrid);
-			Tuple<int,int,int> totals = moderateSolver.Solve();
-			//sudokuGrid.Visible = true;
+		{			
+			HideGrid();
+			Tuple<int,int,int> totals = moderateSolver.Solve();			
+			ShowGrid();		
 			DisplayResults("Full",totals);
-			this.Controls.Add(sudokuGrid);			
 		}
 		
 		void BtnSolveEasyClick(object sender, EventArgs e)
 		{
-			//sudokuGrid.Visible = false;
-			this.Controls.Remove(sudokuGrid);
-			Tuple<int,int,int> totals = simpleSolver.Solve();
-			//sudokuGrid.Visible = true;
+			HideGrid();
+			Tuple<int,int,int> totals = simpleSolver.Solve();			
+			ShowGrid();		
 			DisplayResults("Easy",totals);
-			this.Controls.Add(sudokuGrid);			
 		}
 		
 		void BtnSolveModerateClick(object sender, EventArgs e)
 		{
-			this.Controls.Remove(sudokuGrid);
-			//sudokuGrid.Visible = false;
-			Tuple<int, int, int> totals = moderateSolver.SolveModerate();
-			//sudokuGrid.Visible = true;
+			HideGrid();
+			Tuple<int, int, int> totals = moderateSolver.SolveModerate();			
+			ShowGrid();
 			DisplayResults("Moderate", totals);
-			this.Controls.Add(sudokuGrid);
 		}
 		
 		void DisplayResults(string StrategyDescription, Tuple<int,int,int> totals)
 		{
 			if(sudokuGrid.IsSolved())
 			{
-				DebugWrite(string.Format("Solved with {0} strategy! Totals: {1} removes, {2} solves in {3} rounds.",
-				                         StrategyDescription, totals.Item1, totals.Item2, totals.Item3));
+				DebugWrite("Solved with {0} strategy! Totals: {1} removes, {2} solves in {3} rounds.",
+				                         StrategyDescription, totals.Item1, totals.Item2, totals.Item3);
 			}
 			else
 			{
-				DebugWrite(string.Format("Unable to solve with {0} strategy. {1} removes, {2} solves in {3} rounds.",
-				                         StrategyDescription, totals.Item1, totals.Item2, totals.Item3));
+				DebugWrite("Unable to solve with {0} strategy. {1} removes, {2} solves in {3} rounds.",
+				                         StrategyDescription, totals.Item1, totals.Item2, totals.Item3);
 			}
 		}
 		
