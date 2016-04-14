@@ -83,7 +83,7 @@ namespace SudokuGame
 			guess.AutoSize = false;			
 			guess.Size = new Size(49, 41);
 			guess.TextAlign = ContentAlignment.MiddleCenter;
-			guess.TextChanged += guessTextChanged;
+			//guess.TextChanged += guessTextChanged;
 			Controls.Add(guess);
 			Paint_Guess();
 
