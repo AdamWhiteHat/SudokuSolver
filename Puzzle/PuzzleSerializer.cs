@@ -23,7 +23,7 @@ namespace SudokuGame
 	public class PuzzleSerializer
 	{
 		string[] puzzleFiles = new string[]{ string.Empty };
-		static readonly string puzzleFilePattern = "*.txt";
+		static readonly string puzzleFilePattern = "*.puzzle";
 		
 		public PuzzleSerializer()
 		{
@@ -42,7 +42,7 @@ namespace SudokuGame
 		
 		public List<SudokuCell> LoadPuzzle()
 		{
-			string filename = "easy.puzzle";
+			string filename = GetRandomFile();
 			return LoadPuzzle(filename);
 		}
 		
@@ -71,7 +71,7 @@ namespace SudokuGame
 			if(Filename == null)
 			{
 				int puzzleNumber = Environment.TickCount;
-				string puzzleFilename = string.Format("puzzle{0}.txt", puzzleNumber);
+				string puzzleFilename = string.Format("puzzle{0}.puzzle", puzzleNumber);
 				Filename = puzzleFilename;
 			}
 			

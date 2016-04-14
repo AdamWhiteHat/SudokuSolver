@@ -72,17 +72,17 @@ namespace SudokuForm
 			// 
 			// btnSolve
 			// 
-			this.btnSolve.Location = new System.Drawing.Point(213, 428);
+			this.btnSolve.Location = new System.Drawing.Point(214, 404);
 			this.btnSolve.Name = "btnSolve";
 			this.btnSolve.Size = new System.Drawing.Size(100, 23);
 			this.btnSolve.TabIndex = 5;
-			this.btnSolve.Text = "Solve";
+			this.btnSolve.Text = "Solve (All)";
 			this.btnSolve.UseVisualStyleBackColor = true;
 			this.btnSolve.Click += new System.EventHandler(this.BtnSolveClick);
 			// 
 			// btnSolveEasy
 			// 
-			this.btnSolveEasy.Location = new System.Drawing.Point(213, 453);
+			this.btnSolveEasy.Location = new System.Drawing.Point(214, 429);
 			this.btnSolveEasy.Name = "btnSolveEasy";
 			this.btnSolveEasy.Size = new System.Drawing.Size(100, 23);
 			this.btnSolveEasy.TabIndex = 7;
@@ -92,7 +92,7 @@ namespace SudokuForm
 			// 
 			// btnSolveModerate
 			// 
-			this.btnSolveModerate.Location = new System.Drawing.Point(213, 478);
+			this.btnSolveModerate.Location = new System.Drawing.Point(214, 454);
 			this.btnSolveModerate.Name = "btnSolveModerate";
 			this.btnSolveModerate.Size = new System.Drawing.Size(100, 23);
 			this.btnSolveModerate.TabIndex = 8;
