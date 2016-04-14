@@ -145,7 +145,7 @@ namespace SudokuGame
 			text = text.Replace("|","");
 			
 			// Remove section headers
-			text = text.Replace("[Colors]","");
+			text = text.Replace("[Colours]", "");
 			text = text.Replace("[State]","");
 			text = text.Replace("[PencilMarks]","");
 			text = text.Replace("[Puzzle]","");
