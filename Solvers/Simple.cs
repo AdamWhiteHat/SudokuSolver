@@ -64,10 +64,10 @@ namespace SudokuSolver
 			int candidatesRemoved = 0;
 			foreach (SudokuCell cell in _sudokuGrid.Cells)
 			{				
-				List<int> valuesInScope =_sudokuGrid.GetValuesInCells(_sudokuGrid.GetCellsInScope(cell).ToArray());
+				List<int> valuesInScope =_sudokuGrid.GetValuesInCells(_sudokuGrid.GetCellsInScope(cell).ToArray()).Distinct().ToList();
 				candidatesRemoved += cell.RemoveCandidates(valuesInScope);
 			}
-			return candidatesRemoved;			
+			return candidatesRemoved;
 		}
 
 
