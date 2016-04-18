@@ -64,22 +64,38 @@ namespace SudokuGame
 			SubscribeToEvents();
 		}
 
-		void cellValueChanged(SudokuCell sender, int newValue)
+		void cellValueChanged(SudokuCell sender, int oldValue, int newValue)
 		{
-			IEnumerable<SudokuCell> cellsInScope = GetCellsInScope(sender);
-			List<int> values = GetValuesInCells(cellsInScope.ToArray());
-
-			if (values.Contains(newValue))
+			if (sender == null || newValue == oldValue)
 			{
-				if (HighlightOnError)
-				{
-					sender.HighlightError();
-				}				
+				return;
+			}
+
+			IEnumerable<SudokuCell> cellsInScope = GetCellsInScope(sender);
+			List<int> valuesInScope = GetValuesInCells(cellsInScope.ToArray());					
+				
+			if (newValue == 0 && oldValue != 0)
+			{
+				sender.ResetCandidates();
+				sender.Candidates.RemoveWhere(c => valuesInScope.Contains(c));
+				sender.PaintCell();
+				//RemoveCellCandidates(sender, valuesInScope);
 			}
 			else
 			{
-				sender.HighlightDefault();
+				if (valuesInScope.Contains(newValue))
+				{
+					if (HighlightOnError)
+					{
+						sender.HighlightError();
+					}
+				}
+				else
+				{
+					sender.HighlightDefault();
+				}
 			}
+			
 		}
 
 		private void PopulateGrid()
@@ -103,30 +119,9 @@ namespace SudokuGame
 			return Cells.All(c => c.Value != 0);
 		}
 		
-		public SudokuCell GetCell(int Column, int Row)
+		public int RemoveCellCandidates(SudokuCell cell, List<int> CandidatesToRemove)
 		{
-			return Cells.Where(c => c.Row == Row && c.Column == Column).First();
-		}
-		
-		public int RemoveCellCandidates(int Column, int Row, List<int> CandidatesToRemove)
-		{
-			foreach(SudokuCell cell in Cells)
-			{
-				if(cell.Column == Column && cell.Row == Row)
-				{
-					if(cell.Candidates.Count == 1)
-					{
-//						cell.Value = cell.Candidates.First();
-//						cell.Candidates.Clear();
-//						DebugWrite("@@@ AutoSolve {0} @ block {1}, column {2} row {3}.", cell.Value, cell.Block, cell.Column, cell.Row);
-						return 0;
-					}					
-					int eliminated = cell.RemoveCandidates(CandidatesToRemove);					
-					return eliminated;
-				}
-			}
-			
-			return 0; // Cells.First(cell => (cell.Row == Row && cell.Column == Column)).RemoveCandidates(CandidatesToRemove)
+			return cell.RemoveCandidates(CandidatesToRemove);
 		}
 
 		public List<int> GetValuesInCells(params SudokuCell[] Cells)
@@ -134,7 +129,7 @@ namespace SudokuGame
 			if (Cells == null || Cells.Length < 1)
 				return new List<int>();
 			else
-				return Cells.Select(cell => cell.Value).Where(val => val != 0).ToList();
+				return Cells.Where(c => c.Value != 0).Select(cell => cell.Value).Distinct().ToList();
 		}
 		
 		public IEnumerable<SudokuCell> GetCellsInScope(SudokuCell Cell)

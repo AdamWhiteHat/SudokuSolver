@@ -19,7 +19,6 @@ namespace SudokuGame
 {
 	public partial class SudokuCell : FlowLayoutPanel
 	{
-		public bool AutoSolve = true;
 		public SortedSet<int> Candidates { get; set; }
 		public SudokuGridPosition GridPosition { get; private set; }
 		public int Row { get { return GridPosition.Row; } }
@@ -28,7 +27,7 @@ namespace SudokuGame
 		public Color DefaultBackgroundColor { get; set; }
 		public Color DefaultErrorColor { get; set; }
 
-		public delegate void CellValueChangedHandler(SudokuCell Source, int NewValue);
+		public delegate void CellValueChangedHandler(SudokuCell Source, int OldValue, int NewValue);
 		public event CellValueChangedHandler ValueChanged;
 
 		private bool? _isClue = null;
@@ -44,18 +43,20 @@ namespace SudokuGame
 			get { return this._value; }
 			set
 			{
-				this._value = value;
-				this.OnValueChanged(this, value);
-				// if(value != 0)	Candidates = new SortedSet<int>();
-				// else				Candidates = StaticSudoku.GetAllPossibleCandidates();
+				if (this._value != value)
+				{
+					int oldValue = this._value;
+					this._value = value;
+					this.OnValueChanged(this, oldValue, value);
+				}
 			}
 		}
 
-		public void OnValueChanged(SudokuCell Source, int NewValue)
+		public void OnValueChanged(SudokuCell Source, int oldValue, int newValue)
 		{
 			if (ValueChanged != null)
 			{
-				ValueChanged.Invoke(Source, NewValue);
+				ValueChanged.Invoke(Source, oldValue, newValue);
 			}
 		}
 
@@ -84,7 +85,7 @@ namespace SudokuGame
 			this.Visible = true;
 		}
 
-		private void ResetCandidates()
+		internal void ResetCandidates()
 		{
 			Candidates = new SortedSet<int>(Enumerable.Range(1, StaticSudoku.Dimension));
 		}
@@ -93,7 +94,8 @@ namespace SudokuGame
 		{
 			if (Candidates.Count == 0 && Value == 0)
 			{
-				throw new WarningException("No possibilities left and Value is still not set. This cell is unsolvable; there is a bug in the program.");
+				HighlightError();				
+				return 0;
 			}
 
 			if (IsClue || Candidates.Count == 0)
@@ -104,13 +106,13 @@ namespace SudokuGame
 			int countBefore = Candidates.Count;
 			Candidates = new SortedSet<int>(Candidates.Except(candidates));
 
-			//CheckForNakedSingle();
+			CheckForNakedSingle();
 			return countBefore - Candidates.Count;
 		}
 
-		private bool CheckForNakedSingle()
+		internal bool CheckForNakedSingle()
 		{
-			if (AutoSolve && Candidates.Count == 1)
+			if (Candidates.Count == 1)
 			{
 				Value = Candidates.Single();
 				Candidates.Clear();

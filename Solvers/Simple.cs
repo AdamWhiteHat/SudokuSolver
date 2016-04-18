@@ -62,7 +62,7 @@ namespace SudokuSolver
 		public int EliminateCandidates2()
 		{
 			int candidatesRemoved = 0;
-			foreach (SudokuCell cell in _sudokuGrid.Cells)
+			foreach (SudokuCell cell in _sudokuGrid.Cells.Where(c => !c.IsClue))
 			{
 				List<int> valuesInScope = _sudokuGrid.GetValuesInCells(_sudokuGrid.GetCellsInScope(cell).ToArray()).Distinct().ToList();
 				candidatesRemoved += cell.RemoveCandidates(valuesInScope);
@@ -90,11 +90,11 @@ namespace SudokuSolver
 
 			foreach (SudokuCell cell in nakedSingles)
 			{
-				cell.Value = cell.Candidates.First();
-				cell.Candidates.Clear();
-				solvedTotal++;
-
-				eliminatedTotal += EliminateCandidatesInScopeOfCell(cell);
+				if (cell.CheckForNakedSingle())
+				{
+					solvedTotal++;
+					eliminatedTotal += EliminateCandidatesInScopeOfCell(cell);
+				}
 			}
 
 			return new Tuple<int, int>(eliminatedTotal, solvedTotal);
@@ -172,7 +172,7 @@ namespace SudokuSolver
 
 			foreach (SudokuCell cell in Scope)
 			{
-				eliminatedTotal += _sudokuGrid.RemoveCellCandidates(cell.Column, cell.Row, ValuesToRemove);
+				eliminatedTotal += _sudokuGrid.RemoveCellCandidates(cell, ValuesToRemove);
 			}
 
 			return eliminatedTotal;

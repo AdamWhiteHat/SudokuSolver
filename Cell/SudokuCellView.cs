@@ -21,7 +21,6 @@ namespace SudokuGame
 		private Font Font_CandidatesView = new Font(new FontFamily("Consolas"), 8);
 
 		private EditLabel guess;
-		private Label clue;
 		private List<Label> markings;
 
 		void InitializeView()
@@ -55,29 +54,59 @@ namespace SudokuGame
 				}
 			}
 
-			clue = new Label();
-			clue.Name = string.Format("Clue");
-			clue.Margin = new Padding(0);
-			clue.Font = Font_ClueView;
-			clue.AutoSize = false;
-			clue.Size = new Size(49, 41);
-			clue.TextAlign = ContentAlignment.MiddleCenter;
-			Controls.Add(clue);
-			Paint_Clue();
-
 			guess = new EditLabel();
 			guess.Name = string.Format("Guess");
 			guess.Margin = new Padding(0);
-			guess.Font = Font_GuessView;
 			guess.AutoSize = false;
 			guess.Size = new Size(49, 41);
 			guess.TextAlign = ContentAlignment.MiddleCenter;
+			if (IsClue)
+			{
+				guess.Font = Font_ClueView;
+				guess.Text = this.Value.ToString();				
+				guess.IsEditable = false;				
+			}
+			else
+			{
+				guess.Font = Font_GuessView;
+				guess.Text = "";				
+				guess.EditingSuccessful += guess_EditingSuccessful;
+			}
 			Controls.Add(guess);
 			Paint_Guess();
 
 			Dock = DockStyle.Fill;
 			Margin = new Padding(0);
 			Padding = new Padding(0);
+		}
+
+		void guess_EditingSuccessful(object sender, EventArgs e)
+		{
+			if (string.IsNullOrWhiteSpace(guess.Text))
+			{
+				if (this.Value != 0)
+				{
+					this.Value = 0;
+				}
+				return;
+			}
+
+			int numberValue = 0;
+			string textValue = new string(guess.Text.Where(c => !"()".Contains(c)).ToArray());
+			if (string.IsNullOrWhiteSpace(textValue) || !int.TryParse(textValue, out numberValue) || numberValue==0)
+			{
+				guess.Text = string.Empty;
+				if (this.Value != 0)
+				{
+					this.Value = 0;
+				}
+				return;
+			}
+
+			if (this.Value != numberValue)
+			{
+				this.Value = numberValue;
+			}
 		}
 
 		private void Pencil(Control Ctrl, SudokuCell Cell, int Number)
@@ -92,12 +121,15 @@ namespace SudokuGame
 			}
 			else
 			{
-				Ctrl.Text = " ";
-				Cell.Candidates.Remove(Number);
+				if (Cell.Candidates.Count != 1)
+				{
+					Ctrl.Text = " ";
+					Cell.Candidates.Remove(Number);
+				}
 				Cell.CheckForNakedSingle();
 			}
 		}
-			
+
 		public void HighlightError()
 		{
 			if (this.BackColor != DefaultErrorColor)
@@ -128,7 +160,7 @@ namespace SudokuGame
 
 		public override string ToString()
 		{
-			return (Value == 0) ? FormatCandidatesString_NewLines() : string.Format("({0})", Value);
+			return (Value == 0) ? FormatCandidatesString_NewLines() : IsClue ? string.Format("({0})", Value) : Value.ToString();
 		}
 
 		public void PaintCell()
@@ -136,27 +168,9 @@ namespace SudokuGame
 			if (Candidates != null)
 			{
 				this.SuspendLayout();
-				Paint_Clue();
 				Paint_Guess();
 				Paint_Candidates();
 				this.ResumeLayout();
-			}
-		}
-
-		private void Paint_Clue()
-		{
-			if (clue != null)
-			{
-				if (ShowClue())
-				{
-					clue.Visible = true;
-					clue.Text = string.Format("({0})", Value);
-				}
-				else
-				{
-					clue.Text = string.Empty;
-					clue.Visible = false;
-				}
 			}
 		}
 
@@ -164,62 +178,65 @@ namespace SudokuGame
 		{
 			if (guess != null)
 			{
-				if (ShowGuess())
+				if (IsClue)
 				{
 					guess.Visible = true;
 					guess.Text = string.Format("({0})", Value);
 				}
-				else
+				else if (Value != 0)
 				{
-					guess.Text = string.Empty;
+					guess.Visible = true;
+					guess.Text = string.Format("{0}", Value);
+				}
+				else if (Candidates.Count < 1)  // !IsClue && Value == 0
+				{
+					guess.Visible = true;
+				}
+				else // !IsClue && Value == 0 && Candidates.Count > 0
+				{
 					guess.Visible = false;
+					guess.SendToBack();
 				}
 			}
 		}
 
 		private void Paint_Candidates()
 		{
-			if (markings != null && markings.Count > 0)
+			if (markings == null || markings.Count < 1)
 			{
-				foreach (Control ctrl in Controls)
+				return;
+			}
+
+			foreach (Control ctrl in Controls)
+			{
+				if (ctrl.Name.Contains("Candidate"))
 				{
-					if (ctrl.Name.Contains("Candidate"))
+					if (ShowCandidates())
 					{
-						if (ShowCandidates())
+						ctrl.Visible = true;
+						string strNumber = ctrl.Name.Replace("Candidate", "");
+						int number = Convert.ToInt32(strNumber);
+						if (Candidates.Contains(number))
 						{
-							ctrl.Visible = true;
-							string strNumber = ctrl.Name.Replace("Candidate", "");
-							int number = Convert.ToInt32(strNumber);
-							if (Candidates.Contains(number))
-							{
-								ctrl.Text = number.ToString();
-							}
-							else
-							{
-								ctrl.Text = " ";
-							}
+							ctrl.Text = number.ToString();
 						}
 						else
 						{
-							ctrl.Text = string.Empty;
-							ctrl.Visible = false;
+							ctrl.Text = " ";
 						}
+					}
+					else
+					{
+						ctrl.Text = string.Empty;
+						ctrl.Visible = false;
 					}
 				}
 			}
 		}
 
-		private bool ShowClue()
-		{
-			return (IsClue && Value != 0);
-		}
-		private bool ShowGuess()
-		{
-			return (!IsClue && Value != 0);
-		}
 		private bool ShowCandidates()
 		{
-			return (!IsClue && Value == 0);
+			return (!IsClue && Value == 0 && Candidates.Count > 0);
 		}
 
 		public string FormatCandidatesString_Compact()
