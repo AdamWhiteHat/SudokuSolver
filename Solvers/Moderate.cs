@@ -18,9 +18,10 @@ using SudokuGame;
 namespace SudokuSolver
 {
 	public class Moderate : Simple
-	{
-		Dictionary<string,string> visitedGroups = new Dictionary<string, string>();
-		public Moderate(ISudokuGrid Puzzle) : base(Puzzle)
+	{		
+		private delegate int SolverDelegate(int blockIndex);
+		private Dictionary<string,string> visitedGroups = new Dictionary<string, string>();
+		public Moderate(SudokuGrid Puzzle) : base(Puzzle)
 		{
 			visitedGroups = new Dictionary<string, string>();
 		}
@@ -63,16 +64,9 @@ namespace SudokuSolver
 			List<SolverDelegate> executionPlan = new List<SolverDelegate>();
 			executionPlan.Add(NakedCandidates);
 			executionPlan.Add(HiddenCandidates);
-			//FunctionList.Add(PointingPairs);
 
 			Tuple<int, int, int> totals = ExecutePlan(executionPlan);
 			_sudokuGrid.Visible = false;
-			//totals = totals.Add(NakedCandidates_Loop());			
-			//totals = totals.Add(HiddenCandidates_Loop());
-			//eliminated += PointingPairs_Loop();
-			//
-			//			if(loopPosition>9) loopPosition = 0;
-			//			totals = totals.Add(NakedCandidates(loopPosition++),loopPosition,1));
 
 			_sudokuGrid.Visible = true;
 			_sudokuGrid.PaintGrid();
@@ -112,47 +106,7 @@ namespace SudokuSolver
 
 
 		//////////////////////////////////////////////////////////////////////
-
-
-
-
-		//////////////////////////////////////////////////////////////////////
-
-		// eliminated, solved, rounds
-		private delegate int SolverDelegate(int blockIndex);
-		
-		Tuple<int,int,int> RunSolverFunction(SolverDelegate solverFunction)
-		{
-			Tuple<int,int,int> totals = new Tuple<int, int, int>(0,0,0);
-			for(int counter=1;counter<=StaticSudoku.Dimension;counter++)
-			{
-				int solved = 0;
-				int eliminated = solverFunction(counter);
-				
-				if(eliminated > 0)
-				{
-					totals = totals.Add(eliminated, solved);
-					totals = totals.Add(ScanNakedSingles());
-				}
-			}
-			return totals;
-		}
-		
-		Tuple<int, int, int> NakedCandidates_Loop()
-		{
-			return RunSolverFunction(NakedCandidates);
-		}
-		
-		Tuple<int, int, int> PointingPairs_Loop()
-		{
-			return RunSolverFunction(PointingPairs);
-		}
-		
-		Tuple<int, int, int> HiddenCandidates_Loop()
-		{
-			return RunSolverFunction(HiddenCandidates);
-		}		
-		
+			
 		int NakedCandidates(int counter)
 		{
 			int totalEliminated = 0;
@@ -273,8 +227,7 @@ namespace SudokuSolver
 			
 			return totalEliminated;
 		}
-		
-		
+				
 		
 		int HiddenSingle(List<SudokuCell> block, int single)
 		{
@@ -300,269 +253,70 @@ namespace SudokuSolver
 		int HiddenCandidates(int blockIndex)
 		{
 			int totalEliminated = 0;
-			SudokuBlock sudokuBlock = new SudokuBlock(_sudokuGrid.GetBlockScope(blockIndex));
 			List<SudokuCell> block = GetUnsolvedBlock(blockIndex);
 			RankingDictionary<int> candidateRanking = GetCandidateRanking(block);
 			
 			List<int> hiddenSingle = candidateRanking[1]; // Index == # of occurrences-1, value == candidate digit that appears that number of times
-			List<int> hiddenPair = candidateRanking[2];
-			List<int> hiddenTriple = candidateRanking[3];
-			
-//			List<CellEventInfo> history;
-			
+		
 			if(hiddenSingle.Count != 0)
 			{
 				totalEliminated += HiddenSingle(block, hiddenSingle.First());
 			}
-//			if(hiddenPair.Count != 0)
-//			{
-//				totalEliminated += ExploreHiddenSubset(hiddenPair, block);
-//				history = _sudokuGrid.EditHistory;
-//			}
-//			if(hiddenTriple.Count != 0)
-//			{
-//				totalEliminated += ExploreHiddenSubset(hiddenTriple, block);
-//				history = _sudokuGrid.EditHistory;
-//			}
-			
+
 			return totalEliminated;
 		}
-		
-		
-		int ExploreHiddenSubset(List<int> hiddenSubset, List<SudokuCell> block)
-		{
-			if(hiddenSubset.Count > 0)
-			{
-				
-				DebugWrite("HiddenSubset: Candidate(s) ({0}) has only {1} entries in block {2}.",
-				           StaticSudoku.ArrayToString(hiddenSubset, ", "), hiddenSubset.Count, block[0].Block);
-				
-				List<SudokuCell> subsetCells = GetCellsWithSubset_Any(block, hiddenSubset);
-				
-				if(subsetCells.Count == 0)
-				{
-					return 0;
-				}
-				
-				if(subsetCells.Count==1 && hiddenSubset.Count == 1)
-				{
-					SudokuCell cell = subsetCells[0];
-					int val = hiddenSubset[0];
-					DebugWrite("ELIMINATED NAKED Candidate \"{0}\": Block {1}, column {2}, row {3}.", val, cell.Block, cell.Column, cell.Row);
-					cell.Value = val;
-					
-					return RemoveCandidatesValues(hiddenSubset, _sudokuGrid.GetCellsInScope(cell).ToList());
-				}
-				else if(subsetCells.Count==2 && hiddenSubset.Count == 2)
-				{
-					int col = subsetCells[0].GridPosition.Column;
-					int row = subsetCells[0].GridPosition.Row;
-					bool columnMatch = InSameColumn(subsetCells);
-					bool rowMatch = InSameRow(subsetCells);
-					
-					if(columnMatch)
-					{
-						// search columns
-						List<SudokuCell> scope = _sudokuGrid.GetColumnScope(col).Except(subsetCells).ToList();
-						DebugWrite("HIDDEN PAIR: Eliminated candidates ({0}) on column {1}.",StaticSudoku.ArrayToString(hiddenSubset,","),col);
-						return RemoveCandidatesValues(hiddenSubset, scope);
-					}
-					else if(rowMatch)
-					{
-						// search rows
-						List<SudokuCell> scope = _sudokuGrid.GetRowScope(row).Except(subsetCells).ToList();
-						DebugWrite("HIDDEN PAIR: Eliminated candidates ({0}) on row {1}.",StaticSudoku.ArrayToString(hiddenSubset,","),row);
-						return RemoveCandidatesValues(hiddenSubset, scope);
-					}
-				}
-				else if(subsetCells.Count == 3 && hiddenSubset.Count == 3)
-				{
-					bool columnMatch = InSameColumn(subsetCells);
-					bool rowMatch = InSameRow(subsetCells);
-					
-					if(columnMatch)
-					{
-						int col = subsetCells[0].GridPosition.Column;
-						DebugWrite("_____HIDDEN TRIPLE: On column {0}",col);
-					}
-					else if(rowMatch)
-					{
-						int row = subsetCells[0].GridPosition.Row;
-						DebugWrite("_____HIDDEN TRIPLE: On row {0}",row);
-					}
-				}
-			}
-			return 0;
-		}
-		
-		int PointingPairs(int blockIndex)
-		{
-			List<SudokuCell> block = GetUnsolvedBlock(blockIndex);
-			
-			List<SudokuCell> candidatePair = block.Where(c => c.Candidates.Count==2).ToList();
-			
-			if(candidatePair.Count==2)
-			{
-				List<int> values = candidatePair[0].Candidates.ToList();
-				int columnNumber = candidatePair[0].GridPosition.Column;
-				int rowNumber = candidatePair[0].GridPosition.Row;
-				string ident = DebugCandidateInfo(candidatePair);
-				
-				DebugWrite("Found possible pointing pairs: {0}.",ident);
-				
-				bool isValid = true;
-				foreach(int digit in values)
-				{
-					if(block.Where(c => c.Candidates.Contains(digit)).Count() > 2)
-					{
-						isValid = false;
-					}
-				}
-				if(!isValid)
-				{
-					DebugWrite("Failed for {0}.",ident);
-					return 0;
-				}
-				
-				if(InSameColumn(candidatePair))
-				{
-					DebugWrite("Succeeded (column) for {0}.", ident);
-					List<SudokuCell> scope = _sudokuGrid.GetColumnScope(columnNumber).Except(candidatePair).ToList();
-					return RemoveCandidatesValues(values, scope);
-				}
-				else if(InSameRow(candidatePair))
-				{
-					DebugWrite("Succeeded (row) for {0}.", ident);
-					List<SudokuCell> scope = _sudokuGrid.GetRowScope(rowNumber).Except(candidatePair).ToList();
-					return RemoveCandidatesValues(values, scope);
-				}
-			}
-			if(candidatePair.Count==3)
-			{
-				string ident = DebugCandidateInfo(candidatePair);
-				
-				DebugWrite("Possible pointing TRIPPLE pair for {0}.",ident);
-			}
-			
-			return 0;
-		}
-		
-		List<SudokuCell> GetCellsWithSubset_Any(List<SudokuCell> block, List<int> hiddenSubset)
-		{
-			List<SudokuCell> result = new List<SudokuCell>();
-			
-			foreach(int digit in hiddenSubset)
-			{
-				result.AddRange(block.Where(c => c.Candidates.Contains(digit)).ToList());
-			}
-			
-			return result;
-		}
-		
-		List<SudokuCell> GetCellsWithSubset_Exact(List<SudokuCell> block, List<int> hiddenSubset)
-		{
-			List<SudokuCell> result = new List<SudokuCell>();
-			
-			foreach(SudokuCell cell in block)
-			{
-				bool match = true;
-				SortedSet<int> digitPool = cell.Candidates;
-				
-				foreach(int digit in hiddenSubset)
-				{
-					if(!digitPool.Contains(digit))
-						match = false;
-					else
-						digitPool.Remove(digit);
-				}
-				
-				if(digitPool.Count != 0)
-					match = false;
-				
-				if(match)
-				{
-					result.Add(cell);
-				}
-			}
-			
-			return result;
-		}
-		
+
 		RankingDictionary<int> GetCandidateRanking(List<SudokuCell> block)
 		{
 			FrequencyDictionary<int> candidateFrequency = new FrequencyDictionary<int>();
-			foreach(SudokuCell cell in block)
+			foreach (SudokuCell cell in block)
 			{
 				candidateFrequency.AddRange(cell.Candidates.ToArray());
 			}
 			return candidateFrequency.GetRankingDictionary();
 		}
-		
+
 		List<SudokuCell> GetUnsolvedBlock(int Index)
 		{
-			return _sudokuGrid.GetBlockScope(Index).Where(c=>c.Value==0).ToList();
+			return _sudokuGrid.GetBlockScope(Index).Where(c => c.Value == 0).ToList();
 		}
-		
-		List<SudokuCell> GetUnsolvedRow(int Index)
-		{
-			return _sudokuGrid.GetRowScope(Index).Where(c=>c.Value==0).ToList();
-		}
-		
-		List<SudokuCell> GetUnsolvedColumn(int Index)
-		{
-			return _sudokuGrid.GetColumnScope(Index).Where(c=>c.Value==0).ToList();
-		}
-		
-		
+
 		bool InSameRow(List<SudokuCell> cells)
 		{
-			if(cells.Count < 2)	return false;
+			if (cells.Count < 2) return false;
 			List<int> rows = cells.Select(c => c.GridPosition.Row).ToList();
 			return AllSameNumber(rows);
 		}
-		
+
 		bool InSameColumn(List<SudokuCell> cells)
 		{
-			if(cells.Count < 2)	return false;
+			if (cells.Count < 2) return false;
 			List<int> cols = cells.Select(c => c.GridPosition.Column).ToList();
 			return AllSameNumber(cols);
 		}
-		
+
 		bool InSameBlock(List<SudokuCell> cells)
 		{
-			if(cells.Count < 2)	return false;
+			if (cells.Count < 2) return false;
 			List<int> block = cells.Select(c => c.GridPosition.Block).ToList();
 			return AllSameNumber(block);
 		}
-		
+
 		bool AllSameNumber(List<int> digits)
 		{
-			if(digits.Distinct().Count() == 1)
+			if (digits.Distinct().Count() == 1)
 			{
 				return true;
 			}
 			return false;
 		}
 
-		//////////////////////////////////////////////////////////////////////////////
-
-
 		public StaticSudoku.DisplayOutputDelegate DisplayOutputFunction { get; set; }
-		
-		void DebugWrite(string format, params object[] args)
+
+		private void DebugWrite(string format, params object[] args)
 		{
 			DisplayOutputFunction.Invoke(string.Format(format, args));
 		}
-		
-		string DebugCandidateInfo(List<SudokuCell> candidatePair)
-		{
-			List<int> values = candidatePair[0].Candidates.ToList();
-			int columnNumber = candidatePair[0].GridPosition.Column;
-			int rowNumber = candidatePair[0].GridPosition.Row;
-			int blockNumber = candidatePair[0].GridPosition.Block;
-			return string.Format("Values: {0} Column: {1} Row: {2} Block: {3}",
-			                     StaticSudoku.ArrayToString(values,  ", "),
-			                     columnNumber, rowNumber, blockNumber);
-		}
+
 	}
 }

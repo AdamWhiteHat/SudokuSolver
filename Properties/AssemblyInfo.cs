@@ -17,13 +17,13 @@ using MultiKeyDictionaries;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("www.csharpprogramming.tips")]
 [assembly: AssemblyProduct("SudokuSolver_AJR")]
-[assembly: AssemblyCopyright("Copyright 2014 Adam Rakaska")]
+[assembly: AssemblyCopyright("Copyright 2016 Adam Rakaska")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // DebuggerDisplay Attributes
 [assembly: DebuggerDisplay(@"\{Value = {Value}}", Target = typeof(SudokuCell))]
-[assembly: DebuggerDisplay(@"\{ {EventType} : C = {Column} R = {Row} B = {Block} Values = {Values}}", Target = typeof(CellEventInfo))]
+//[assembly: DebuggerDisplay(@"\{ {EventType} : C = {Column} R = {Row} B = {Block} Values = {Values}}", Target = typeof(CellEventInfo))]
 //[assembly: DebuggerDisplay(@"\{Value = {Enumerator}}", Target = typeof(RankingDictionary<T>))]
 //[assembly: DebuggerDisplay(@"\{Value = {Enumerator}}", Target = typeof(FrequencyDictionary<T>))]
 

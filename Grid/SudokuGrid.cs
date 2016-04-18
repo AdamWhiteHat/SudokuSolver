@@ -17,25 +17,7 @@ using SudokuSolver;
 
 namespace SudokuGame
 {
-	public interface ISudokuGrid
-	{
-		bool IsSolved();
-		List<SudokuCell> Cells { get; }
-		bool Visible { get; set; }
-		void PaintGrid();
-		SudokuCell GetCell(int Column, int Row);
-
-		List<int> GetValuesInCells(params SudokuCell[] Cells);
-		IEnumerable<SudokuCell> GetCellsInScope(SudokuCell Cell);
-
-		List<SudokuCell> GetRowScope(int Index);
-		List<SudokuCell> GetColumnScope(int Index);
-		List<SudokuCell> GetBlockScope(int Index);
-		int RemoveCellCandidates(int Column, int Row, List<int> CandidatesToRemove);
-	}
-	
-	
-	public partial class SudokuGrid : TableLayoutPanel, ISudokuGrid
+	public partial class SudokuGrid : TableLayoutPanel
 	{
 		private List<SudokuCell> _cells = null;
 		public List<SudokuCell> Cells { get { return _cells; } }
@@ -49,8 +31,7 @@ namespace SudokuGame
 			/**** Create Grid ****/
 			this.Name = "SudokuGrid";
 			this.RowCount = StaticSudoku.Dimension;
-			this.ColumnCount = StaticSudoku.Dimension;
-            float percent = 100/StaticSudoku.Dimension;
+			this.ColumnCount = StaticSudoku.Dimension;            
 			
 			this.Size = new System.Drawing.Size(450, 378); // Size(55*9, 42*9); // 495
 			this.GrowStyle = TableLayoutPanelGrowStyle.FixedSize;
@@ -113,7 +94,7 @@ namespace SudokuGame
 		{
 			foreach (SudokuCell cell in Cells)
 			{				
-				cell.ValueChanged += cellValueChanged;
+				cell.ValueChanged += cellValueChanged;				
 			}
 		}
 				
@@ -147,21 +128,6 @@ namespace SudokuGame
 			
 			return 0; // Cells.First(cell => (cell.Row == Row && cell.Column == Column)).RemoveCandidates(CandidatesToRemove)
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		public List<int> GetValuesInCells(params SudokuCell[] Cells)
 		{

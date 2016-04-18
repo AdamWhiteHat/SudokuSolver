@@ -77,8 +77,7 @@ namespace MultiKeyDictionaries
 		public int Count { get { return this._dictionary.Count; } }
 		public IEnumerable<T> Keys { get { return this._dictionary.Keys; } }
 		public FrequencyDictionary() { _dictionary = new Dictionary<T, int>(); }
-		public FrequencyDictionary(int Capacity) { _dictionary = new Dictionary<T, int>(); }
-		
+				
 		public void AddRange(T[] items)
 		{
 			foreach(T item in items) { this.Add(item); }
@@ -115,16 +114,7 @@ namespace MultiKeyDictionaries
 			}			
 			return str.ToString();
 		}
-				
-//		public T this[int Index]
-//		{
-//			get 
-//			{
-//				if(this._dictionary.Keys.Count < Index+1) { Index = this._dictionary.Keys.Count-1; }
-//				return this._dictionary.Keys.ElementAt(Index);
-//			}
-//		}
-		
+
 		public RankingDictionary<T> GetRankingDictionary()
 		{
 			RankingDictionary<T> result = new RankingDictionary<T>();

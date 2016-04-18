@@ -14,32 +14,19 @@ using EditLabelControl;
 
 namespace SudokuGame
 {
-	public partial class SudokuCell : FlowLayoutPanel	 //, ISudokuCell
+	public partial class SudokuCell : FlowLayoutPanel
 	{
-		Font Font_ClueView       = new Font(new FontFamily("Microsoft Sans Serif"), 8, FontStyle.Bold);
-		Font Font_GuessView      = new Font(new FontFamily("Microsoft Sans Serif"), 8, FontStyle.Regular);
-		Font Font_CandidatesView = new Font(new FontFamily("Consolas"), 8);
+		private Font Font_ClueView = new Font(new FontFamily("Microsoft Sans Serif"), 8, FontStyle.Bold);
+		private Font Font_GuessView = new Font(new FontFamily("Microsoft Sans Serif"), 8, FontStyle.Regular);
+		private Font Font_CandidatesView = new Font(new FontFamily("Consolas"), 8);
 
-		void Pencil(Control Ctrl, SudokuCell Cell, int Number)
-		{
-			if (Ctrl.Text == " ")
-			{
-				Ctrl.Text = Number.ToString();
-				if (!Cell.Candidates.Contains(Number))
-				{
-					Cell.Candidates.Add(Number);
-				}
-			}
-			else
-			{
-				Ctrl.Text = " ";
-				Cell.Candidates.Remove(Number);
-				Cell.CheckForNakedSingle();
-            }
-		}
+		private EditLabel guess;
+		private Label clue;
+		private List<Label> markings;
 
 		void InitializeView()
 		{
+			markings = new List<Label>();
 			if (!IsClue && Value == 0)
 			{
 				foreach (int number in Enumerable.Range(1, StaticSudoku.Dimension))
@@ -60,30 +47,33 @@ namespace SudokuGame
 					);
 
 					//marking.BackColor = Color.White;
-					Controls.Add(marking);
+					markings.Add(marking);
+				}
+
+				if (markings != null && markings.Count > 0)
+				{
+					Controls.AddRange(markings.ToArray());
 				}
 			}
 
 			//EditLabel clue = new EditLabel();
-			Label clue = new Label();
+			clue = new Label();
 			clue.Name = string.Format("Clue");
 			clue.Margin = new Padding(0);
 			clue.Font = Font_ClueView;
 			clue.AutoSize = false;
-			//clue.BackColor = Color.DarkRed;
 			clue.Size = new Size(49, 41);
 			clue.TextAlign = ContentAlignment.MiddleCenter;
 			Controls.Add(clue);
 			Paint_Clue();
 
-			EditLabel guess = new EditLabel();
+			guess = new EditLabel();
 			guess.Name = string.Format("Guess");
 			guess.Margin = new Padding(0);
-			guess.Font = Font_GuessView;			
-			guess.AutoSize = false;			
+			guess.Font = Font_GuessView;
+			guess.AutoSize = false;
 			guess.Size = new Size(49, 41);
 			guess.TextAlign = ContentAlignment.MiddleCenter;
-			//guess.TextChanged += guessTextChanged;
 			Controls.Add(guess);
 			Paint_Guess();
 
@@ -92,64 +82,55 @@ namespace SudokuGame
 			Padding = new Padding(0);
 		}
 
-		void guessTextChanged(object sender, EventArgs e)
+		private void Pencil(Control Ctrl, SudokuCell Cell, int Number)
 		{
-			EditLabel source = (EditLabel)sender;
-
-			int newValue = 0;
-			if (!int.TryParse(source.Text, out newValue))
+			if (Ctrl.Text == " ")
 			{
-				this.Value = 0;
-				source.Text = string.Empty;
+				Ctrl.Text = Number.ToString();
+				if (!Cell.Candidates.Contains(Number))
+				{
+					Cell.Candidates.Add(Number);
+				}
 			}
 			else
 			{
-				this.Value = newValue;
+				Ctrl.Text = " ";
+				Cell.Candidates.Remove(Number);
+				Cell.CheckForNakedSingle();
 			}
 		}
-
+			
 		public void HighlightError()
 		{
 			if (this.BackColor != DefaultErrorColor)
 			{
-				this.DefaultBackColor = this.BackColor;
+				this.DefaultBackgroundColor = this.BackColor;
 				SetControlsBackColor(DefaultErrorColor);
 			}
 		}
 
 		public void HighlightDarkGrey()
 		{
-			DefaultBackColor = Color.DarkGray;
+			DefaultBackgroundColor = Color.DarkGray;
 			SetControlsBackColor(Color.DarkGray);
 		}
 
 		public void HighlightDefault()
 		{
-			if (this.BackColor != this.DefaultBackColor)
+			if (this.BackColor != this.DefaultBackgroundColor)
 			{
-				SetControlsBackColor(DefaultBackColor);
+				SetControlsBackColor(DefaultBackgroundColor);
 			}
 		}
 
 		private void SetControlsBackColor(Color backColor)
 		{
 			this.BackColor = backColor;
-			//foreach (Control ctrl in this.Controls)
-			//{
-			//	ctrl.BackColor = backColor;
-			//}
 		}
 
 		public override string ToString()
 		{
-			if (Value == 0)
-			{
-				return FormatCandidatesString_NewLines();
-			}
-			else
-			{
-				return string.Format("({0})", Value);
-			}
+			return (Value == 0) ? FormatCandidatesString_NewLines() : string.Format("({0})", Value);
 		}
 
 		public void PaintCell()
@@ -166,58 +147,67 @@ namespace SudokuGame
 
 		private void Paint_Clue()
 		{
-			Control ctrl = Controls["Clue"];
-			if (ShowClue())
-			{				
-				ctrl.Visible = true;
-				ctrl.Text = string.Format("({0})", Value);
-			}
-			else
+			if (clue != null)
 			{
-				ctrl.Text = string.Empty;
-				ctrl.Visible = false;
+				if (ShowClue())
+				{
+					clue.Visible = true;
+					clue.Text = string.Format("({0})", Value);
+				}
+				else
+				{
+					clue.Text = string.Empty;
+					clue.Visible = false;
+				}
 			}
 		}
 
 		private void Paint_Guess()
 		{
-			Control ctrl = Controls["Guess"];
-			if (ShowGuess())
+			if (guess != null)
 			{
-				ctrl.Visible = true;
-				ctrl.Text = string.Format("({0})", Value);
-			}
-			else
-			{
-				ctrl.Text = string.Empty;
-				ctrl.Visible = false;
+				if (ShowGuess())
+				{
+					string position = GridPosition.ToString();
+					guess.Visible = true;
+					guess.Text = string.Format("({0})", Value);
+				}
+				else
+				{
+					string position = GridPosition.ToString();
+					guess.Text = string.Empty;
+					guess.Visible = false;
+				}
 			}
 		}
 
 		private void Paint_Candidates()
 		{
-			foreach (Control ctrl in Controls)
+			if (markings != null && markings.Count > 0)
 			{
-				if (ctrl.Name.Contains("Candidate"))
+				foreach (Control ctrl in Controls)
 				{
-					if (ShowCandidates())
+					if (ctrl.Name.Contains("Candidate"))
 					{
-						ctrl.Visible = true;
-						string strNumber = ctrl.Name.Replace("Candidate","");
-						int number = Convert.ToInt32(strNumber);
-						if (Candidates.Contains(number))
+						if (ShowCandidates())
 						{
-							ctrl.Text = number.ToString();
+							ctrl.Visible = true;
+							string strNumber = ctrl.Name.Replace("Candidate", "");
+							int number = Convert.ToInt32(strNumber);
+							if (Candidates.Contains(number))
+							{
+								ctrl.Text = number.ToString();
+							}
+							else
+							{
+								ctrl.Text = " ";
+							}
 						}
 						else
 						{
-							ctrl.Text = " ";
+							ctrl.Text = string.Empty;
+							ctrl.Visible = false;
 						}
-					}
-					else
-					{
-						ctrl.Text = string.Empty;
-						ctrl.Visible = false;
 					}
 				}
 			}
@@ -225,11 +215,11 @@ namespace SudokuGame
 
 		private bool ShowClue()
 		{
-			return (this.IsClue && Value != 0);
+			return (IsClue && Value != 0);
 		}
 		private bool ShowGuess()
 		{
-			return (!this.IsClue && Value != 0);
+			return (!IsClue && Value != 0);
 		}
 		private bool ShowCandidates()
 		{
@@ -244,7 +234,7 @@ namespace SudokuGame
 		public string FormatCandidatesString_NewLines()
 		{
 			string spacer = " ";
-			string[] numbers = {Environment.NewLine,spacer,spacer,spacer,spacer,spacer,spacer,spacer,spacer,spacer};
+			string[] numbers = { Environment.NewLine, spacer, spacer, spacer, spacer, spacer, spacer, spacer, spacer, spacer };
 
 			foreach (int digit in Candidates)
 			{

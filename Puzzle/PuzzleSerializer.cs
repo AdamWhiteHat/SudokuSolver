@@ -184,29 +184,6 @@ namespace SudokuGame
 			return result;
 		}
 		
-		string GetHeaderSection(List<string> lines, int headerIndex)
-		{
-//			if(!lines[headerIndex].Contains("[Puzzle]"))
-//			{
-//				return string.Empty;
-//			}
-			int index = headerIndex;
-			string result = string.Empty;
-			while(result.Length < StaticSudoku.Size)
-			{
-				string currLine = lines[index].Replace(" ","");
-				
-				foreach(char c in currLine)
-				{
-					if(char.IsNumber(c))
-					{
-						result += c.ToString();
-					}
-				}
-				index++;
-			}
-			return result;
-		}
 		
 		
 	}

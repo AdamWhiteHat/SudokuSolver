@@ -32,7 +32,7 @@ namespace SudokuGame
 		
 		public static List<SudokuCell> TranslateBoard(List<int> board)
 		{
-			if(board.Count != StaticSudoku.Size) { throw new ArgumentException(String.Format("Parameter must have exactly 81 items.",StaticSudoku.Size) ); }
+			if(board.Count != StaticSudoku.Size) { throw new ArgumentException(string.Format("Parameter must have exactly {0} items.",StaticSudoku.Size) ); }
 			
 			int cellCounter = 0;
 			List<SudokuCell> result = new List<SudokuCell>(StaticSudoku.Size);

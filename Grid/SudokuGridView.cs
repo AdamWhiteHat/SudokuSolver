@@ -14,14 +14,14 @@ using System.Windows.Forms;
 
 namespace SudokuGame
 {
-	public partial class SudokuGrid : TableLayoutPanel, ISudokuGrid
+	public partial class SudokuGrid : TableLayoutPanel
 	{
 		public StaticSudoku.DisplayOutputDelegate DisplayOutputFunction { get; set; }
-		
-		void DebugWrite(string format, params object[] args)
-		{
-			DisplayOutputFunction.Invoke(string.Format(format, args));
-		}
+
+		//private void DebugWrite(string format, params object[] args)
+		//{
+		//	DisplayOutputFunction.Invoke(string.Format(format, args));
+		//}
 		
 		private void HighlightBlocks()
 		{

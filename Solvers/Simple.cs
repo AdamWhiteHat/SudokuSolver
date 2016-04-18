@@ -19,10 +19,10 @@ namespace SudokuSolver
 {
 	public class Simple
 	{
-		protected ISudokuGrid _sudokuGrid = null;
+		protected SudokuGrid _sudokuGrid = null;
 		private delegate List<SudokuCell> ScopeRegionDelegate(int Index);
 
-		public Simple(ISudokuGrid BoardToSolve)
+		public Simple(SudokuGrid BoardToSolve)
 		{
 			_sudokuGrid = BoardToSolve;
 		}
@@ -49,7 +49,7 @@ namespace SudokuSolver
 			}
 			while (eliminatedRound != 0 && solvedRound != 0);
 
-			_sudokuGrid.PaintGrid();
+			//_sudokuGrid.PaintGrid();
 
 			return new Tuple<int, int, int>(eliminatedTotal, solvedTotal, rounds);
 		}
@@ -63,8 +63,8 @@ namespace SudokuSolver
 		{
 			int candidatesRemoved = 0;
 			foreach (SudokuCell cell in _sudokuGrid.Cells)
-			{				
-				List<int> valuesInScope =_sudokuGrid.GetValuesInCells(_sudokuGrid.GetCellsInScope(cell).ToArray()).Distinct().ToList();
+			{
+				List<int> valuesInScope = _sudokuGrid.GetValuesInCells(_sudokuGrid.GetCellsInScope(cell).ToArray()).Distinct().ToList();
 				candidatesRemoved += cell.RemoveCandidates(valuesInScope);
 			}
 			return candidatesRemoved;
@@ -90,11 +90,11 @@ namespace SudokuSolver
 
 			foreach (SudokuCell cell in nakedSingles)
 			{
-					cell.Value = cell.Candidates.First();
-					cell.Candidates.Clear();
-					solvedTotal++;
+				cell.Value = cell.Candidates.First();
+				cell.Candidates.Clear();
+				solvedTotal++;
 
-					eliminatedTotal += EliminateCandidatesInScopeOfCell(cell);
+				eliminatedTotal += EliminateCandidatesInScopeOfCell(cell);
 			}
 
 			return new Tuple<int, int>(eliminatedTotal, solvedTotal);
