@@ -46,7 +46,6 @@ namespace SudokuGame
 						}
 					);
 
-					//marking.BackColor = Color.White;
 					markings.Add(marking);
 				}
 
@@ -56,7 +55,6 @@ namespace SudokuGame
 				}
 			}
 
-			//EditLabel clue = new EditLabel();
 			clue = new Label();
 			clue.Name = string.Format("Clue");
 			clue.Margin = new Padding(0);
@@ -168,13 +166,11 @@ namespace SudokuGame
 			{
 				if (ShowGuess())
 				{
-					string position = GridPosition.ToString();
 					guess.Visible = true;
 					guess.Text = string.Format("({0})", Value);
 				}
 				else
 				{
-					string position = GridPosition.ToString();
 					guess.Text = string.Empty;
 					guess.Visible = false;
 				}
