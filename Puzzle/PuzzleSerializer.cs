@@ -1,11 +1,7 @@
 /*
  *
- * Developed by Adam Rakaska
+ * Developed by Adam White
  *  http://csharpcodewhisperer.blogspot.com
- *    http://arakaska.wix.com/intelligentsoftware
- *
- *
- * Made using SharpDevelop
  *
  * 
  */

@@ -1,8 +1,7 @@
 /*
  *
- * Developed by Adam Rakaska
- *  http://www.csharpprogramming.tips
- *    http://arakaska.wix.com/intelligentsoftware
+ * Developed by Adam White
+ *  https://csharpcodewhisperer.blogspot.com
  * 
  */
 using System;
@@ -49,7 +48,7 @@ namespace SudokuSolver
 			}
 			while (eliminatedRound != 0 && solvedRound != 0);
 
-			//_sudokuGrid.PaintGrid();
+			_sudokuGrid.PaintGrid();
 
 			return new Tuple<int, int, int>(eliminatedTotal, solvedTotal, rounds);
 		}
@@ -69,18 +68,6 @@ namespace SudokuSolver
 			}
 			return candidatesRemoved;
 		}
-
-
-
-
-
-
-
-
-
-
-
-
 
 		public Tuple<int, int> ScanNakedSingles()
 		{

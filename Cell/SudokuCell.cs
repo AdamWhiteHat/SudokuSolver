@@ -1,25 +1,23 @@
 /*
  *
- * Developed by Adam Rakaska
- *  http://www.csharpprogramming.tips
- *    http://arakaska.wix.com/intelligentsoftware
+ * Developed by Adam White
+ *  https://csharpcodewhisperer.blogspot.com
  * 
  */
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
+using System.Drawing;
+using System.Diagnostics;
 using System.Windows.Forms;
-
+using System.ComponentModel;
+using System.Collections.Generic;
 using SudokuSolver;
 
 namespace SudokuGame
 {
 	public partial class SudokuCell : FlowLayoutPanel
 	{
-		public SortedSet<int> Candidates { get; set; }
+		public CandidatesList Candidates { get; set; }
 		public SudokuGridPosition GridPosition { get; private set; }
 		public int Row { get { return GridPosition.Row; } }
 		public int Block { get { return GridPosition.Block; } }
@@ -52,7 +50,7 @@ namespace SudokuGame
 			}
 		}
 
-		public void OnValueChanged(SudokuCell Source, int oldValue, int newValue)
+		private void OnValueChanged(SudokuCell Source, int oldValue, int newValue)
 		{
 			if (ValueChanged != null)
 			{
@@ -63,7 +61,7 @@ namespace SudokuGame
 		public SudokuCell(int column, int row, int value)
 		{
 			this.Visible = false;
-			Candidates = new SortedSet<int>();
+			Candidates = new CandidatesList();
 			DefaultBackgroundColor = this.BackColor;
 			DefaultErrorColor = Color.MistyRose;
 			DoubleBuffered = true;
@@ -74,40 +72,15 @@ namespace SudokuGame
 
 			if (IsClue)
 			{
-				Candidates = new SortedSet<int>(); // Empty. We don't need candidates because this cell already knows its value.
+				Candidates.Clear(); // Empty. We don't need candidates because this cell already knows its value.
 			}
 			else
 			{
-				ResetCandidates(); // All possible numbers, 1 through 9
+				Candidates.Renew(); // All possible numbers, 1 through 9
 			}
 
 			InitializeView();
 			this.Visible = true;
-		}
-
-		internal void ResetCandidates()
-		{
-			Candidates = new SortedSet<int>(Enumerable.Range(1, StaticSudoku.Dimension));
-		}
-
-		public int RemoveCandidates(List<int> candidates)
-		{
-			if (Candidates.Count == 0 && Value == 0)
-			{
-				HighlightError();				
-				return 0;
-			}
-
-			if (IsClue || Candidates.Count == 0)
-			{
-				return 0;
-			}
-
-			int countBefore = Candidates.Count;
-			Candidates = new SortedSet<int>(Candidates.Except(candidates));
-
-			CheckForNakedSingle();
-			return countBefore - Candidates.Count;
 		}
 
 		internal bool CheckForNakedSingle()
@@ -120,6 +93,11 @@ namespace SudokuGame
 				return true;
 			}
 			return false;
+		}
+
+		public int RemoveCandidates(List<int> candidateValues)
+		{
+			return this.Candidates.RemoveRange(candidateValues);
 		}
 	}
 }

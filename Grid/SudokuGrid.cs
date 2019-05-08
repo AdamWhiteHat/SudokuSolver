@@ -1,8 +1,7 @@
 /*
  *
- * Developed by Adam Rakaska
- *  http://www.csharpprogramming.tips
- *    http://arakaska.wix.com/intelligentsoftware
+ * Developed by Adam White
+ *  https://csharpcodewhisperer.blogspot.com
  * 
  */
 using System;
@@ -57,7 +56,7 @@ namespace SudokuGame
 		
 			PopulateGrid();
 			
-			HighlightBlocks();
+			//HighlightBlocks();
 			
 			PaintGrid();
 
@@ -76,10 +75,9 @@ namespace SudokuGame
 				
 			if (newValue == 0 && oldValue != 0)
 			{
-				sender.ResetCandidates();
-				sender.Candidates.RemoveWhere(c => valuesInScope.Contains(c));
+				sender.Candidates.Renew();
+				sender.Candidates.RemoveRange(valuesInScope);
 				sender.PaintCell();
-				//RemoveCellCandidates(sender, valuesInScope);
 			}
 			else
 			{
@@ -121,7 +119,7 @@ namespace SudokuGame
 		
 		public int RemoveCellCandidates(SudokuCell cell, List<int> CandidatesToRemove)
 		{
-			return cell.RemoveCandidates(CandidatesToRemove);
+			return cell.Candidates.RemoveRange(CandidatesToRemove);
 		}
 
 		public List<int> GetValuesInCells(params SudokuCell[] Cells)

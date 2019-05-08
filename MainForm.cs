@@ -1,8 +1,7 @@
 /*
  *
- * Developed by Adam Rakaska
- *  http://www.csharpprogramming.tips
- *    http://arakaska.wix.com/intelligentsoftware
+ * Developed by Adam White
+ *  https://csharpcodewhisperer.blogspot.com
  * 
  */
 using System;
@@ -64,7 +63,7 @@ namespace SudokuForm
 			HideGrid();
 			InitializeGrid(filename);
 			sudokuGrid.PaintGrid();
-			ShowGrid();		
+			ShowGrid();
 		}
 
 		void BtnNewPuzzleClick(object sender, EventArgs e)
@@ -113,16 +112,18 @@ namespace SudokuForm
 
 		private void HideGrid()
 		{
-			//sudokuGrid.Visible = false;
-			this.Controls.Remove(sudokuGrid); 
-			//this.SuspendLayout();
+			if (this.Controls.Contains(sudokuGrid))
+			{
+				this.Controls.Remove(sudokuGrid);
+			}
 		}
 
 		private void ShowGrid()
 		{
-			this.Controls.Add(sudokuGrid); 
-			//this.ResumeLayout();
-			//sudokuGrid.Visible = true;
+			if (!this.Controls.Contains(sudokuGrid))
+			{
+				this.Controls.Add(sudokuGrid);
+			}
 		}
 
 		void DisplayResults(string StrategyDescription, Tuple<int, int, int> totals)

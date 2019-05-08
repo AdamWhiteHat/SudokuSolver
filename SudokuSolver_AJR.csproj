@@ -58,6 +58,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cell\CandidatesList.cs" />
+    <Compile Include="Controls\SudokuBoard.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SudokuBoard.Designer.cs">
+      <DependentUpon>SudokuBoard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SudokuCellControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SudokuCellControl.Designer.cs">
+      <DependentUpon>SudokuCellControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\MultiDictionary.cs" />
     <Compile Include="Sudoku\StaticSudoku.cs" />
     <Compile Include="Sudoku\SudokuEnums.cs" />
@@ -91,6 +104,12 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Controls\SudokuBoard.resx">
+      <DependentUpon>SudokuBoard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SudokuCellControl.resx">
+      <DependentUpon>SudokuCellControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

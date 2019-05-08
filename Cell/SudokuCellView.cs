@@ -1,24 +1,23 @@
 /*
  *
- * Developed by Adam Rakaska
- *  http://www.csharpprogramming.tips
- *    http://arakaska.wix.com/intelligentsoftware
+ * Developed by Adam White
+ *  https://csharpcodewhisperer.blogspot.com
  * 
  */
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.Drawing;
 using System.Windows.Forms;
+using System.Collections.Generic;
 using EditLabelControl;
 
 namespace SudokuGame
 {
 	public partial class SudokuCell : FlowLayoutPanel
 	{
-		private Font Font_ClueView = new Font(new FontFamily("Microsoft Sans Serif"), 8, FontStyle.Bold);
-		private Font Font_GuessView = new Font(new FontFamily("Microsoft Sans Serif"), 8, FontStyle.Regular);
-		private Font Font_CandidatesView = new Font(new FontFamily("Consolas"), 8);
+		private Font Font_Clue = new Font(new FontFamily("Microsoft Sans Serif"), 8, FontStyle.Bold);
+		private Font Font_Guess = new Font(new FontFamily("Microsoft Sans Serif"), 8, FontStyle.Regular);
+		private Font Font_Candidates = new Font(new FontFamily("Consolas"), 8);
 
 		private EditLabel guess;
 		private List<Label> markings;
@@ -32,7 +31,7 @@ namespace SudokuGame
 				{
 					Label marking = new Label();
 					marking.Name = string.Format("Candidate{0}", number);
-					marking.Font = Font_CandidatesView;
+					marking.Font = Font_Candidates;
 					marking.AutoSize = true;
 					marking.Margin = new Padding(0);
 					marking.Padding = new Padding(1, 0, 2, 0);
@@ -62,14 +61,14 @@ namespace SudokuGame
 			guess.TextAlign = ContentAlignment.MiddleCenter;
 			if (IsClue)
 			{
-				guess.Font = Font_ClueView;
-				guess.Text = this.Value.ToString();				
-				guess.IsEditable = false;				
+				guess.Font = Font_Clue;
+				guess.Text = this.Value.ToString();
+				guess.IsEditable = false;
 			}
 			else
 			{
-				guess.Font = Font_GuessView;
-				guess.Text = "";				
+				guess.Font = Font_Guess;
+				guess.Text = "";
 				guess.EditingSuccessful += guess_EditingSuccessful;
 			}
 			Controls.Add(guess);
@@ -77,7 +76,6 @@ namespace SudokuGame
 
 			Dock = DockStyle.Fill;
 			Margin = new Padding(0);
-			Padding = new Padding(0);
 		}
 
 		void guess_EditingSuccessful(object sender, EventArgs e)
@@ -93,7 +91,7 @@ namespace SudokuGame
 
 			int numberValue = 0;
 			string textValue = new string(guess.Text.Where(c => !"()".Contains(c)).ToArray());
-			if (string.IsNullOrWhiteSpace(textValue) || !int.TryParse(textValue, out numberValue) || numberValue==0)
+			if (string.IsNullOrWhiteSpace(textValue) || !int.TryParse(textValue, out numberValue) || numberValue == 0)
 			{
 				guess.Text = string.Empty;
 				if (this.Value != 0)
