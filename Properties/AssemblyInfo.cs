@@ -15,9 +15,9 @@ using MultiKeyDictionaries;
 [assembly: AssemblyTitle("SudokuSolver_AJR")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("www.csharpprogramming.tips")]
+[assembly: AssemblyCompany("https://csharpcodewhisperer.blogspot.com")]
 [assembly: AssemblyProduct("SudokuSolver_AJR")]
-[assembly: AssemblyCopyright("Copyright 2016 Adam Rakaska")]
+[assembly: AssemblyCopyright("Copyright 2016 Adam White")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
